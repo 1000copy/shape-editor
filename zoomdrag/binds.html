@@ -1,0 +1,84 @@
+<html>
+<head>
+<script type='text/javascript'>
+
+/*
+* 订阅模式 李久彬
+*/
+var sub = function(){
+	this.items = [];
+}
+
+sub.prototype = {
+	addSub : function(item){
+		this.items.push(item);
+	},
+	notify : function(value, data){
+		this.items.forEach(function(item){
+			item.refresh(value, data);
+		});
+	}
+}
+
+var action = function(value, callBack){
+	this.value = value;
+	this.callBack = callBack;
+}
+
+action.prototype = {
+	refresh:function(value, data){
+		if(value != this.value){
+			return;
+		}
+		if(this.callBack){
+			this.callBack(data);
+		}
+	}
+}
+
+</script>
+</head>
+<body>
+	<input type='text' id="tid"/>
+	<input type='text' id='tvalue'/>
+	<input type='text' id='t2value'/>
+</body>
+<script type="text/javascript">
+
+	var transferOrders = new sub();
+	var trueAction = new action(true, function(value){
+		document.getElementById("tvalue").value = value;
+	});
+	transferOrders.addSub(trueAction);
+	var falseAction = new action(false, function(value){
+		document.getElementById("t2value").value = value;
+	});
+	transferOrders.addSub(falseAction);
+
+	var createNew = new sub();
+	createNew.addSub(new action());
+
+	var pageStatus = (function(){
+		var temp = {};
+		Object.defineProperty(temp, "transferOrders", {//调单
+			set : function(value){
+				transferOrders.notify(value.value, value.data);
+			}
+		});
+		Object.defineProperty(temp, "createNew", {//新建订单
+			set : function(value){
+				createNew.notify(value.value, value.data);
+			}
+		});
+		return temp;
+	}());
+
+	var tid = document.getElementById("tid");
+	tid.addEventListener("keyup", function(){
+		pageStatus.transferOrders = {
+				value : tid.value % 2 == 0,
+				data: tid.value
+			}
+	});
+</script>
+</html>
