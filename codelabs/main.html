@@ -14,7 +14,20 @@
         <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.4/raphael-min.js"></script>
         <script src="editor.js"></script>
         <script >
-            var e = new Editor(Raphael,"shapesCanvas",1000,512)
+            class Paper {
+                constructor(elementId, width, height){
+                    this.paper = Raphael(elementId, width, height)
+                    this.elementId = elementId
+                    this.width = width
+                    this.height = height
+                    this.$el = $("#" + elementId);
+                    this.offset = this.$el.offset()
+                }
+                rectByCenter(x,y,width,height){
+                    return this.paper.rect(x - width/2,y - height/2,width,height)
+                }
+            }
+            this.e  = new Editor(new Paper("shapesCanvas",1000,512))
         </script>
     </body>
 </html>
