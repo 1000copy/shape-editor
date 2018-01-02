@@ -9,6 +9,10 @@
         </style>
     </head>
     <body>
+        <div id="" >
+            <input name ="state" type="radio" value="select" checked/>select
+            <input name ="state" type="radio" value="draw"/>draw
+        </div>
         <div id="shapesCanvas" style="width:1000px; height:512px"></div>
         <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.1.4/raphael-min.js"></script>
@@ -23,11 +27,13 @@
                     this.$el = $("#" + elementId);
                     this.offset = this.$el.offset()
                 }
-                rectByCenter(x,y,width,height){
-                    return this.paper.rect(x - width/2,y - height/2,width,height)
-                }
             }
             this.e  = new Editor(new Paper("shapesCanvas",1000,512))
+            self = this
+            $("input[name='state']").click(function(){
+                var state = $(this).val();
+                self.e.setState(state);
+            });
         </script>
     </body>
 </html>
