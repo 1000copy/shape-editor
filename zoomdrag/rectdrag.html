@@ -20,6 +20,7 @@ var nowX, nowY, R = Raphael("canvas", 500, 500),
     },
     move = function (dx, dy) {
       this.attr({x: this.originx + dx, y: this.originy + dy}); 
+      // this.attr({x: this.attr("x") + dx, y: this.attr("y") + dy}); 
     },
     up = function () {
         // restoring state

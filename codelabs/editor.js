@@ -119,28 +119,29 @@ class Rect extends Dragable{
     this.initDrag(this)
   }
   drag(dx,dy,x,y){
-    var xx = dx - this.prevX
-    var yy = dy - this.prevY
-    this.doOffset(xx,yy)
-    this.handles.doOffset(xx,yy)
-    this.prevX = dx
-    this.prevY = dy
+    var newoffsetx = dx - this.prevdx
+    var newoffsety = dy - this.prevdy
+    this.doOffset(newoffsetx,newoffsety)
+    this.handles.doOffset(newoffsetx,newoffsety)
+    this.prevdx = dx
+    this.prevdy = dy
   }
-  doOffset(xx,yy){
-    this._x +=  xx
-    this._y += yy
+  doOffset(newoffsetx,newoffsety){
+    this._x +=  newoffsetx
+    this._y += newoffsety
     this.element.attr({'x':this._x, 'y':this._y})
   }
   stopDrag(){
-    if(this.prevX == 0 && this.prevY == 0){
+    if(this.prevdx == 0 && this.prevdy == 0){
       this.isSelected = !this.isSelected
       this.handles.drawHandles(this._x,this._y,this._width,this._height)
       this.drawShape()
+
     }
   }
   startDrag(x,y){
-    this.prevX = 0
-    this.prevY = 0
+    this.prevdx = 0
+    this.prevdy = 0
   }
   drawShape() {
     var x = this._x ,
