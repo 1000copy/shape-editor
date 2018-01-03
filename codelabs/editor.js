@@ -119,18 +119,29 @@ class Rect extends Dragable{
     this.initDrag(this)
   }
   drag(dx,dy,x,y){
-
+    var xx = dx - this.prevX
+    var yy = dy - this.prevY
+    this.doOffset(xx,yy)
+    this.handles.doOffset(xx,yy)
+    this.prevX = dx
+    this.prevY = dy
+  }
+  doOffset(xx,yy){
+    this._x +=  xx
+    this._y += yy
+    this.element.attr({'x':this._x, 'y':this._y})
   }
   stopDrag(){
-
+    if(this.prevX == 0 && this.prevY == 0){
+      this.isSelected = !this.isSelected
+      this.handles.drawHandles(this._x,this._y,this._width,this._height)
+      this.drawShape()
+    }
   }
-
   startDrag(x,y){
-    this.isSelected = !this.isSelected
-    this.handles.drawHandles(this._x,this._y,this._width,this._height)
-    this.drawShape()
+    this.prevX = 0
+    this.prevY = 0
   }
-  
   drawShape() {
     var x = this._x ,
         y = this._y ,
@@ -171,6 +182,12 @@ class Handles{
     this.handles = []
     this.handleSize = 8
   }
+  doOffset(x,y){
+    for (var i = 0; i < this.handles.length; i++) {
+      var handle = this.handles[i]
+      handle.doOffset(x,y)
+    }
+  }
   drawHandles(x,y,width,height){
     var resultxys = this.HandlesCords (x,y,width,height)
     for (var i = 0; i < resultxys.length; i++) {
@@ -180,7 +197,7 @@ class Handles{
     }
   }
   makeHandle(x,y){
-    return this.editor.rectByCenter(x, y, this.handleSize, this.handleSize);
+    return new Handle(this.editor,x,y)
   }
   HandlesCords(x,y,width,height){
     var xs = [x,x + width/2,x+width]
@@ -197,11 +214,55 @@ class Handles{
   show(isSelected){
      for (var i = 0; i < this.handles.length; i++) {
         var handle = this.handles[i]
-         if(isSelected){
-           handle.show()
-        }else{
-           handle.hide()
-        }
+        handle.show(isSelected)
       }
+  }
+}
+class RectNative{
+  constructor(editor,x,y,width,height){
+    this.editor = editor
+    this.offset = editor.offset
+    this._x = x 
+    this._y = y 
+    this._width = width
+    this._height = height
+    this._strokeColor =  "blue"
+    this._strokeWidth =  1;
+    this.element = this.editor.makeRect(this._x, this._y, this._width, this._height);
+    this.element.attr({'fill-opacity': 0.01,
+                       'fill': '#fff',
+                       'cursor': 'pointer'});
+    this.drawShape()
+  }
+  drawShape() {
+    var x = this._x ,
+        y = this._y ,
+        w = this._width ,
+        h = this._height ;
+    this.element.attr({'x':x, 'y':y,
+                       'width':w, 'height':h,
+                       'stroke': this._strokeColor,
+                       'stroke-width': this._strokeWidth});
+  }
+  show(visible){
+    if(visible)
+      this.element.show()
+    else
+      this.element.hide()
+  }
+  destroy() {
+    this.element.remove()
+  };
+}
+class Handle extends RectNative{
+  constructor(editor,x,y){
+    var handleSize = 8
+    super(editor,x - handleSize / 2,y - handleSize / 2,handleSize,handleSize)
+    this.handleSize = handleSize
+  }
+  doOffset(x,y){
+    this._x += x
+    this._y += y
+    this.element.attr({'x':this._x, 'y':this._y});
   }
 }
